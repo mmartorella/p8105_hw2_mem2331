@@ -7,4 +7,26 @@ output: github_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+
+#load libraries:
+
+library(tidyverse)
+
+library(readxl)
+
 ```
+
+
+# Problem 1:
+
+Load in Mr. Trash Wheel data:
+
+```{r}
+
+mtw <- read_excel("HealthyHarborWaterWheelTotals2018-7-28.xlsx", 
+                  sheet = "Mr. Trash Wheel", 
+                  range = "A2:N338")
+
+```
+
+
