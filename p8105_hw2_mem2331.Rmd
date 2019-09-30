@@ -19,6 +19,8 @@ library(readxl)
 
 # Problem 1:
 
+## Mr. Trash Wheel
+
 1. Load in Mr. Trash Wheel data 
 2. omit rows containing NA 
 3. round sports balls to an integer:
@@ -34,6 +36,43 @@ mtw <- read_excel("HealthyHarborWaterWheelTotals2018-7-28.xlsx",
 
 ```
 
+## 2017 and 2018 Rain
 
+1. Load Precip 2017 and 2018 data
+2. omit NA
+3. Add Year variable
+4. Combine 2017 and 2018 data and convert Month variable to character:
+
+```{r}
+
+#2017 and 2018 data:
+
+rain_2018 <- read_excel("HealthyHarborWaterWheelTotals2018-7-28.xlsx",
+                   sheet = "2018 Precipitation",
+                   range = "A2:B15") %>% 
+  drop_na()
+
+rain_2018 <- rain_2018 %>% 
+  mutate("Year" = rep("2018", n = nrow(rain_2018))) %>% 
+  select(Year, Month, Total)
+
+rain_2017 <- read_excel("HealthyHarborWaterWheelTotals2018-7-28.xlsx",
+                   sheet = "2017 Precipitation",
+                   range = "A2:B15") %>% 
+  drop_na()
+
+rain_2017 <- rain_2017 %>% 
+  mutate("Year" = rep("2017", n = nrow(rain_2018))) %>% 
+  select(Year, Month, Total)
+
+#combined data:
+
+rain <- rbind(rain_2017, rain_2018) %>% 
+  mutate(Month = month.name[Month])
+
+#both year and month variables are characters, 
+#could convert to factor or numeric using mutate if necessary.
+
+```
 
 
