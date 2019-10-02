@@ -27,7 +27,7 @@ library(readxl)
 
 ```{r}
 
-mtw <- read_excel("HealthyHarborWaterWheelTotals2018-7-28.xlsx", 
+mtw <- read_excel("Trash-Wheel-Collection-Totals-8-6-19.xlsx", 
                   sheet = "Mr. Trash Wheel", 
                   range = "A2:N338") %>% 
   drop_na() %>% 
@@ -46,7 +46,7 @@ mtw <- read_excel("HealthyHarborWaterWheelTotals2018-7-28.xlsx",
 
 ```{r}
 
-#2017 and 2018 data:
+#2018 data:
 
 rain_2018 <- read_excel("HealthyHarborWaterWheelTotals2018-7-28.xlsx",
                    sheet = "2018 Precipitation",
@@ -54,8 +54,11 @@ rain_2018 <- read_excel("HealthyHarborWaterWheelTotals2018-7-28.xlsx",
   drop_na()
 
 rain_2018 <- rain_2018 %>% 
-  mutate("Year" = rep("2018", n = nrow(rain_2018))) %>% 
+  mutate("Year" = rep("2018", 
+                      n = nrow(rain_2018))) %>% 
   select(Year, Month, Total)
+
+#2017 data:
 
 rain_2017 <- read_excel("HealthyHarborWaterWheelTotals2018-7-28.xlsx",
                    sheet = "2017 Precipitation",
@@ -63,7 +66,8 @@ rain_2017 <- read_excel("HealthyHarborWaterWheelTotals2018-7-28.xlsx",
   drop_na()
 
 rain_2017 <- rain_2017 %>% 
-  mutate("Year" = rep("2017", n = nrow(rain_2018))) %>% 
+  mutate("Year" = rep("2017", 
+                      n = nrow(rain_2018))) %>% 
   select(Year, Month, Total)
 
 #combined data:
@@ -71,8 +75,7 @@ rain_2017 <- rain_2017 %>%
 rain <- rbind(rain_2017, rain_2018) %>% 
   mutate(Month = month.name[Month])
 
-#both year and month variables are characters, 
-#could convert to factor or numeric using mutate if necessary.
+#for year based weight summary:
 
 wt_2017 <- mtw %>% 
   filter(year == 2017)
@@ -86,7 +89,34 @@ wt_2018 <- mtw %>%
 
 The __mtw__ dataset has *`r nrow(mtw)`* observations of *`r ncol(mtw)`* variables. Generally, these variables specify the month and year, amount and types of trash collected, and the number of homes powered as a result of the trash collected. The __rain__ dataset provides monthly rain totals from Jan-Dec 2017 and Jan-July 2018, and it has *`r nrow(rain)`* observations of *`r ncol(rain)`* variables.
 
-The median number of sports balls collected in the year 2017 was *`r median(pull(mtw, sports_balls))`*. The amount of trash collected is known to be a function of the amount of rainfall. The average precipitation from Jan-July 2017 was *`r mean(pull(rain_2017, Total))`*, and from Jan-July 2018 it was *`r mean(pull(rain_2018, Total))`*. The average amount of trash collected from Jan-Nov 2017 was *`r mean(pull(wt_2017, weight_tons))`* tons, and from Jan-July 2018 was *`r mean(pull(wt_2018, weight_tons))`* tons. This data suggests that the increased average rainfall in 2018 also led to an increase in the amount of trash collected compared to 2017.
+The median number of sports balls collected in the year 2017 was *`r median(pull(mtw, sports_balls))`*. 
+
+The amount of trash collected is known to be a function of the amount of rainfall. The average precipitation from Jan-Dec 2017 was *`r mean(pull(rain_2017, Total))`*, and from Jan-July 2018 it was *`r mean(pull(rain_2018, Total))`*. The average amount of trash collected from Jan-Nov 2017 was *`r mean(pull(wt_2017, weight_tons))`* tons, and from Jan-Aug 2018 was *`r mean(pull(wt_2018, weight_tons))`* tons. This data suggests that the increased average rainfall in 2018 also led to an increase in the amount of trash collected compared to 2017.
 
 # Problem 2:
+
+Load and clean the data:
+
+```{r}
+
+pols <- read_csv(file = "fivethirtyeight_datasets/pols-month.csv") %>% 
+  separate(col = mon, into = c("year", "month", "day"), sep = "-") %>% 
+  mutate(month = as.integer(month), 
+         month = month.name[month],
+         day = NULL,
+         prez_gop = recode(prez_gop, `0` = "dem", `1` = "gop"),
+         prez_dem = NULL)%>% 
+  pivot_longer(cols = prez_gop, 
+               names_to = "delete", 
+               values_to = "president") %>%
+  mutate(delete = NULL)
+  
+
+
+
+
+```
+
+
+
 
