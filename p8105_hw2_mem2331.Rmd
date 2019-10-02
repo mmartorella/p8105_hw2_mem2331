@@ -21,9 +21,7 @@ library(readxl)
 
 ## Mr. Trash Wheel
 
-1. Load in Mr. Trash Wheel data 
-2. omit rows containing NA 
-3. round sports balls to an integer:
+Load in Mr. Trash Wheel data and clean:
 
 ```{r}
 
@@ -39,10 +37,7 @@ mtw <- read_excel("Trash-Wheel-Collection-Totals-8-6-19.xlsx",
 
 ## 2017 and 2018 Rain
 
-1. Load Precip 2017 and 2018 data
-2. omit NA
-3. Add Year variable
-4. Combine 2017 and 2018 data and convert Month variable to character:
+Load Precip 2017 and 2018 data and clean:
 
 ```{r}
 
@@ -95,27 +90,76 @@ The amount of trash collected is known to be a function of the amount of rainfal
 
 # Problem 2:
 
-Load and clean the data:
+Load and clean pols-month data:
 
 ```{r}
 
 pols <- read_csv(file = "fivethirtyeight_datasets/pols-month.csv") %>% 
-  separate(col = mon, into = c("year", "month", "day"), sep = "-") %>% 
+  separate(col = mon, 
+           into = c("year", "month", "day"), 
+           sep = "-") %>% 
   mutate(month = as.integer(month), 
          month = month.name[month],
+         year = as.numeric(year),
          day = NULL,
          prez_gop = recode(prez_gop, `0` = "dem", `1` = "gop"),
-         prez_dem = NULL)%>% 
+         prez_dem = NULL) %>% 
   pivot_longer(cols = prez_gop, 
                names_to = "delete", 
                values_to = "president") %>%
   mutate(delete = NULL)
-  
 
+```
 
+Load and clean snp data:
+
+```{r}
+
+snp <- read_csv(file = "fivethirtyeight_datasets/snp.csv") %>%
+  separate(col = date, 
+           into = c("month", "day", "year"), 
+           sep = "/") %>% 
+  mutate(day = NULL,
+         month = as.integer(month),
+         month = month.name[month],
+         year = as.numeric(year)) %>% 
+  select("year", "month", everything())
+
+```
+
+Load and clean unemployment data:
+
+```{r}
+
+jobs <- read_csv(file = "fivethirtyeight_datasets/unemployment.csv") %>%
+  pivot_longer(cols = 2:13,
+               names_to = "month",
+               values_to = "p_unemployed") %>% 
+  rename(year = Year) %>% 
+  mutate(month = match(month, month.abb),
+         month = month.name[month])
 
 
 ```
+
+Combine data:
+
+```{r}
+
+all <- left_join(pols, snp, by = c("year", "month"))
+
+all <- left_join(all, jobs, by = c("year", "month"))
+
+```
+
+The __pols__ dataset contains the number of elected officials representing the republican and democratic parties from the year `r min(pull(pols, year))` to `r max(pull(pols, year))`, broken down by month. It has a total of `r nrow(pols)` observations of `r ncol(pols)` variables. The variable *president* denotes whether the president was republican (*gop*) or democrat (*dem*) for every month and year.
+
+The __snp__ dataset has `r nrow(snp)` observations of Standard & Poor’s stock market index (S&P) along with the year and month the index was observed. There are a total of `r ncol(snp)` variables, and the stock market index is reported in the variable *close*. It presents data from the year `r min(pull(snp, year))` to `r max(pull(snp, year))`.
+
+The __jobs__ dataset reports the percent unemployment from `r min(pull(jobs, year))` to `r max(pull(jobs, year))`. It has a total of `r nrow(jobs)` observations of `r ncol(jobs)` variables. Percent unemployment is provided under the variable *p_unemployed*.
+
+
+
 
 
 
