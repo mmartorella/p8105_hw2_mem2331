@@ -158,8 +158,72 @@ The __snp__ dataset has `r nrow(snp)` observations of Standard & Poor’s stock 
 
 The __jobs__ dataset reports the percent unemployment from `r min(pull(jobs, year))` to `r max(pull(jobs, year))`. It has a total of `r nrow(jobs)` observations of `r ncol(jobs)` variables. Percent unemployment is provided under the variable *p_unemployed*.
 
+The __all__ table merges these datasets together based on month and year. It has `r nrow(pols)` observations of `r ncol(pols)` variables. Importantly, these data were combined such that all observations from each dataset were kept. The __pols__ data set has the largest range of dates, and since observations for __snp__ and __jobs__ were not collected until later years, earlier years in the __all__ data set will contain NA values for observations in those years. The key variables are the same as those mentioned in the individual datasets (*president*, *close*, *p_unemployed*)
 
+#Problem 3:
 
+Load in baby data:
+
+```{r}
+
+babies <- read_csv(file = "Popular_Baby_Names.csv") %>% 
+  janitor::clean_names() %>% 
+  mutate(gender = str_to_lower(gender),
+         ethnicity = str_to_lower(ethnicity),
+         childs_first_name = str_to_lower(childs_first_name),
+         ethnicity = recode(ethnicity, 
+                            "asian and paci" = "asian and pacific islander", 
+                            "black non hisp" = "black non hispanic", 
+                            "white non hisp" = "white non hispanic")) %>% 
+  rename(sex = gender) %>% 
+  distinct()
+
+```
+
+Preparing table of Olivia popularity:
+
+```{r}
+
+olivia <- babies %>% 
+  filter(childs_first_name == "olivia") %>% 
+  arrange(year_of_birth) %>% 
+  pivot_wider(id_cols = c(ethnicity, childs_first_name), 
+              names_from = year_of_birth, 
+              values_from = rank)
+
+```
+
+Preparing table of male name popularity:
+
+```{r}
+
+male <- babies %>% 
+  filter(sex == "male") %>% 
+  arrange(year_of_birth) %>%
+  pivot_wider(id_cols = c(ethnicity, childs_first_name), 
+              names_from = year_of_birth, 
+              values_from = rank)
+
+```
+
+Filter male names data and plot:
+
+```{r}
+
+mw_2016 <- babies %>% 
+  filter(sex == "male",
+         year_of_birth == 2016,
+         ethnicity == "white non hispanic") %>% 
+  arrange(year_of_birth)
+
+mw_2016 %>% ggplot(aes(x = rank, y = count)) +
+  geom_point() +
+  ggtitle("Number of Children with a Baby Name") +
+  xlab("Popularity Rank of Baby Name") +
+  ylab("Number of Babies Named") +
+  theme_bw()
+
+```
 
 
 
