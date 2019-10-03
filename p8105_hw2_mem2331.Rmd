@@ -160,7 +160,7 @@ The __jobs__ dataset reports the percent unemployment from `r min(pull(jobs, yea
 
 The __all__ table merges these datasets together based on month and year. It has `r nrow(pols)` observations of `r ncol(pols)` variables. Importantly, these data were combined such that all observations from each dataset were kept. The __pols__ data set has the largest range of dates, and since observations for __snp__ and __jobs__ were not collected until later years, earlier years in the __all__ data set will contain NA values for observations in those years. The key variables are the same as those mentioned in the individual datasets (*president*, *close*, *p_unemployed*)
 
-#Problem 3:
+# Problem 3:
 
 Load in baby data:
 
